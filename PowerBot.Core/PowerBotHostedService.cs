@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using PowerBot.Core.Managers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,6 +59,9 @@ namespace PowerBot.Core
         {
             var message = messageEventArgs.Message;
 
+            // Process user in db
+            var user = await UserManager.AddOrUpdateUser(messageEventArgs);
+
             // Exmaple
             await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
 
@@ -65,5 +69,4 @@ namespace PowerBot.Core
                 await Bot.SendTextMessageAsync(message.Chat.Id, message.Text);
         }
     }
-
 }
