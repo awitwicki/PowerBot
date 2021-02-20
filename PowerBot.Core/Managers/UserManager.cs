@@ -1,6 +1,7 @@
 ﻿using PowerBot.Core.Data;
 using PowerBot.Core.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
@@ -14,6 +15,11 @@ namespace PowerBot.Core.Managers
         public static User GetUser(int id)
         {
             return _dbContext.Users.Find(id);
+        }
+        
+        public static List<User> GetUsers()
+        {
+            return _dbContext.Users.ToList();
         }
 
         public static User GetUserByTelegamId(int id)

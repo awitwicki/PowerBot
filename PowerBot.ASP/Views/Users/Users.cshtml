@@ -1,0 +1,30 @@
+﻿@model PowerBot.ASP.Models.UsersViewModel
+
+@{
+    ViewData["Title"] = "Users";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>List of all stored bot users</p>
+
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Telegram Id</th>
+        <th>Username</th>
+        <th>Full name</th>
+        <th>Active At</th>
+        <th>Access</th>
+    </tr>
+    @foreach (var user in Model.Users)
+    {
+        <tr>
+            <td>@user.Id</td>
+            <td>@user.TelegramId</td>
+            <td><a href="http://t.me/@user.UserName">@user.UserName</a></td>
+            <td>@user.FullName</td>
+            <td>@user.ActiveAt</td>
+            <td>@user.UserAccess.ToString()</td>
+        </tr>
+    }
+</table>
