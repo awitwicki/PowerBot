@@ -59,5 +59,11 @@ namespace PowerBot.Core.Managers
 
             return usr;
         }
+
+        public static async void UpdateUser(User user)
+        {
+            _dbContext.Update(user);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

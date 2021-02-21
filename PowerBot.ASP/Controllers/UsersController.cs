@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using PowerBot.ASP.Models;
 using PowerBot.Core;
 using PowerBot.Core.Managers;
+using PowerBot.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,6 +27,20 @@ namespace PowerBot.ASP.Controllers
             vm.Users = UserManager.GetUsers();
 
             return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult GrantUserAccess(int userId, UserAccess userAccess)
+        {
+            var usr = UserManager.GetUser(userId);
+
+            if (usr == null)
+                return new NotFoundResult();
+
+            usr.UserAccess = userAccess;
+            UserManager.UpdateUser(usr);
+
+            return RedirectToAction(nameof(Users));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
