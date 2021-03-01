@@ -22,7 +22,7 @@
         <tr>
             <td>@user.Id</td>
             <td>@user.TelegramId</td>
-            <td><a href="http://t.me/@user.UserName">@user.UserName</a></td>
+            <td><a href="@Url.Action("GetUser", "Users", new { id = user.Id })">@user.UserName</a></td>
             <td>@user.FullName</td>
             <td>@user.ActiveAt</td>
             <td>@user.UserAccess.ToString()</td>

@@ -15,10 +15,12 @@ namespace PowerBot.ASP.Controllers
     public class UsersController : Controller
     {
         private readonly ILogger<UsersController> _logger;
+        private readonly PowerBotHostedService _powerBot;
 
-        public UsersController(ILogger<UsersController> logger)
+        public UsersController(ILogger<UsersController> logger, PowerBotHostedService powerBot)
         {
             _logger = logger;
+            _powerBot = powerBot;
         }
 
         public IActionResult Users()
@@ -47,6 +49,32 @@ namespace PowerBot.ASP.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult GetUser(int id)
+        {
+            var usr = UserManager.GetUser(id);
+
+            if (usr == null)
+                return new NotFoundResult();
+
+            var vm = new UserViewModel();
+            vm.User = usr;
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(int userId, string text)
+        {
+            var usr = UserManager.GetUser(userId);
+
+            if (usr == null)
+                return new NotFoundResult();
+
+            await _powerBot.BotClient.SendTextMessageAsync(usr.TelegramId, text);
+
+            return RedirectToAction(nameof(GetUser), new { id = userId});
         }
     }
 }

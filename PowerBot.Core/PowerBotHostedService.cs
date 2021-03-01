@@ -15,6 +15,7 @@ namespace PowerBot.Core
     public class PowerBotHostedService : IHostedService
     {
         private static TelegramBotClient Bot { get; set; }
+        public TelegramBotClient BotClient => Bot;
 
         private readonly IServiceProvider _scopeFactory;
         private readonly IConfiguration _configuration;

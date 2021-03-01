@@ -9,7 +9,8 @@ namespace PowerBot.Core
     {
         public static IServiceCollection AddPowerBot(this IServiceCollection services)
         {
-            services.AddHostedService<PowerBotHostedService>();
+            services.AddSingleton<PowerBotHostedService>();
+            services.AddHostedService(provider => provider.GetService<PowerBotHostedService>());
             return services;
         }
     }
