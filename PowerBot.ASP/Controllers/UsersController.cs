@@ -72,9 +72,20 @@ namespace PowerBot.ASP.Controllers
             if (usr == null)
                 return new NotFoundResult();
 
-            await _powerBot.BotClient.SendTextMessageAsync(usr.TelegramId, text);
+            var vm = new UserViewModel();
+            vm.User = usr;
 
-            return RedirectToAction(nameof(GetUser), new { id = userId});
+            //TODO: rework to logic layer with sendMessageResults
+            try
+            {
+                await _powerBot.BotClient.SendTextMessageAsync(usr.TelegramId, text);
+            }
+            catch (Exception ex)
+            {
+                vm.SendMessageError = ex.Message;
+            }
+
+            return View(nameof(GetUser), vm);
         }
     }
 }
