@@ -1,4 +1,5 @@
-﻿using PowerBot.Core.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PowerBot.Core.Data;
 using PowerBot.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -12,24 +13,27 @@ namespace PowerBot.Core.Managers
     {
         public static PowerBotContext _dbContext = new PowerBotContext();
 
-        public static User GetUser(int id)
+        public static async Task<User> GetUser(int id)
         {
-            return _dbContext.Users.Find(id);
+            var user = await _dbContext.Users.FindAsync(id);
+            return user;
         }
         
-        public static List<User> GetUsers()
+        public static async Task<List<User>> GetUsers()
         {
-            return _dbContext.Users.ToList();
+            var users = await _dbContext.Users.ToListAsync();
+            return users;
         }
 
-        public static User GetUserByTelegamId(int id)
+        public static async Task<User> GetUserByTelegamId(int id)
         {
-            return _dbContext.Users.SingleOrDefault(x => x.TelegramId == id);
+            var user = await _dbContext.Users.SingleOrDefaultAsync(x => x.TelegramId == id);
+            return user;
         }
 
         public static async Task<User> AddOrUpdateUser(MessageEventArgs message)
         {
-            var usr = GetUserByTelegamId(message.Message.From.Id);
+            var usr = await GetUserByTelegamId(message.Message.From.Id);
 
             // New user
             if (usr == null)
@@ -44,7 +48,8 @@ namespace PowerBot.Core.Managers
                     UserAccess = UserAccess.User
                 };
 
-                usr = _dbContext.Users.Add(user).Entity;
+                var usrEntity = await _dbContext.Users.AddAsync(user);
+                usr = usrEntity.Entity;
             }
             // Update User
             else
@@ -60,7 +65,7 @@ namespace PowerBot.Core.Managers
             return usr;
         }
 
-        public static async void UpdateUser(User user)
+        public static async Task UpdateUser(User user)
         {
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();

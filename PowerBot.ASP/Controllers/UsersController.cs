@@ -23,24 +23,24 @@ namespace PowerBot.ASP.Controllers
             _powerBot = powerBot;
         }
 
-        public IActionResult Users()
+        public async Task<IActionResult> Users()
         {
             var vm = new UsersViewModel();
-            vm.Users = UserManager.GetUsers();
+            vm.Users = await UserManager.GetUsers();
 
             return View(vm);
         }
 
         [HttpPost]
-        public IActionResult GrantUserAccess(int userId, UserAccess userAccess)
+        public async Task<IActionResult> GrantUserAccess(int userId, UserAccess userAccess)
         {
-            var usr = UserManager.GetUser(userId);
+            var usr = await UserManager.GetUser(userId);
 
             if (usr == null)
                 return new NotFoundResult();
 
             usr.UserAccess = userAccess;
-            UserManager.UpdateUser(usr);
+            await UserManager.UpdateUser(usr);
 
             return RedirectToAction(nameof(Users));
         }
@@ -51,9 +51,9 @@ namespace PowerBot.ASP.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult GetUser(int id)
+        public async Task<IActionResult> GetUser(int id)
         {
-            var usr = UserManager.GetUser(id);
+            var usr = await UserManager.GetUser(id);
 
             if (usr == null)
                 return new NotFoundResult();
@@ -67,7 +67,7 @@ namespace PowerBot.ASP.Controllers
         [HttpPost]
         public async Task<IActionResult> SendMessage(int userId, string text)
         {
-            var usr = UserManager.GetUser(userId);
+            var usr = await UserManager.GetUser(userId);
 
             if (usr == null)
                 return new NotFoundResult();
