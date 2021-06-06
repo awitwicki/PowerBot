@@ -1,0 +1,47 @@
+﻿@page "/users"
+
+@using PowerBot.Core.Managers
+
+<h1>List of all stored bot users</h1>
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Telegram Id</th>
+                <th>Username</th>
+                <th>Full name</th>
+                <th>Active At</th>
+                <th>Access</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.TelegramId</td>
+                    <td><a href="/user/@user.Id">@@@user.UserName</a></td>
+                    <td>@user.FullName</td>
+                    <td>@user.ActiveAt</td>
+                    <td>@user.UserAccess</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<PowerBot.Core.Models.User> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserManager.GetUsers();
+    }
+}

@@ -1,0 +1,117 @@
+﻿@page "/user/{Id}"
+
+@using PowerBot.Core
+@using PowerBot.Core.Managers
+@using PowerBot.Core.Models
+
+@inject PowerBotHostedService powerBotService;
+
+<h3>User</h3>
+
+<span><b>Id</b> @user.Id</span>
+<br />
+<span><b>Telegram Id</b> @user.TelegramId</span>
+<br />
+<span><b>Username</b> <a href="http://t.me/@user.UserName">@@@user.UserName</a></span>
+<br />
+<span><b>Full name</b> @user.FullName</span>
+<br />
+<span><b>Access</b> @user.UserAccess</span>
+<br />
+<span><b>Last activity</b> @user.ActiveAt.ToString()</span>
+<br />
+<button class="btn btn-outline-info" @onclick="@ModalShow">Change User Access</button>
+
+<br />
+<br />
+<h4>Send message</h4>
+<div class="form-group">
+    <input @bind="message" class="form-control" placeholder="Your text message" required />
+</div>
+<span class="btn-success">@sendMessageSuccess</span>
+<span class="btn-danger">@sendMessageError</span>
+<br />
+<button @onclick="SendMessage" class="btn btn-success">Send message</button>
+
+@if (showModal)
+{
+    <div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm action</h4>
+                    <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <p>This is the modal content!</p>
+                    <label for="pwd">User Access:</label>
+                    <select @bind="newUserAccess" class="form-control">
+                        @foreach (var access in Enum.GetValues(typeof(UserAccess)))
+                        {
+                            <option value="@access">@access</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn" @onclick="@ModalCancel">Cancel</button>
+                    <button type="button" class="btn btn-success" @onclick=@ModalOk>Save</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    public int id => int.Parse(Id);
+
+    private PowerBot.Core.Models.User user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserManager.GetUser(id);
+    }
+
+    //Send message to user
+    private string sendMessageSuccess;
+    private string sendMessageError;
+    private string message;
+    private async Task SendMessage()
+    {
+        sendMessageSuccess = "";
+        sendMessageError = "";
+
+        if (message == default(string))
+        {
+            sendMessageError = "Message text is empty";
+            return;
+        }
+
+        await powerBotService.BotClient.SendTextMessageAsync(user.TelegramId, message);
+        sendMessageSuccess = "Sent";
+    }
+
+    //Edit user access
+    void ModalShow() => showModal = true;
+    void ModalCancel() => showModal = false;
+    async Task ModalOk()
+    {
+        user.UserAccess = newUserAccess;
+        await UserManager.UpdateUserAccess(user.Id, newUserAccess);
+        showModal = false;
+    }
+
+    private List<PowerBot.Core.Models.User> users;
+    private bool showModal = false;
+
+    private UserAccess newUserAccess;
+    private int userId;
+}

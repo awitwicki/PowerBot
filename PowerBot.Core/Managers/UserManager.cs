@@ -70,5 +70,13 @@ namespace PowerBot.Core.Managers
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();
         }
+
+        public static async Task UpdateUserAccess(int userId, UserAccess userAccess)
+        {
+            var user = await GetUser(userId);
+            user.UserAccess = userAccess;
+            _dbContext.Update(user);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }
