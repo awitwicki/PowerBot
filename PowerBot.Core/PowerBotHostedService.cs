@@ -72,7 +72,7 @@ namespace PowerBot.Core
                 MessageInvoker(messageEventArgs);
         }
 
-        private async void MessageInvoker(MessageEventArgs messageEventArgs)
+        private async Task MessageInvoker(MessageEventArgs messageEventArgs)
         {
             //Get message data
             var chatId = messageEventArgs.Message.Chat.Id;
@@ -109,7 +109,7 @@ namespace PowerBot.Core
                             ((BaseHandler)handler).Init(Bot, user, messageEventArgs);
 
                             //Invoke method
-                            method.Invoke(handler, parameters: new object[] { });
+                            await (Task)method.Invoke(handler, parameters: new object[] { });
                         }
                         catch (Exception ex)
                         {
