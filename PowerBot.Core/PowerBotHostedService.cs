@@ -78,46 +78,49 @@ namespace PowerBot.Core
             var chatId = messageEventArgs.Message.Chat.Id;
             var user = await UserManager.AddOrUpdateUser(messageEventArgs);
             
-            string methodName = messageEventArgs.Message.Text;
-
             //Get all handlers
             var handlers = ReflectiveEnumerator.GetEnumerableOfType<BaseHandler>();
 
             foreach (var handlerType in handlers)
             {
                 //Find method in handler
-                MethodInfo method = handlerType.GetMethod(methodName);
-                if (method != null)
+                MethodInfo[] handlerMethods = handlerType.GetMethods();
+
+                foreach (var method in handlerMethods)
                 {
-                    //Check user access by role
-                    if (!BaseHandler.ValidateAccess(method, user))
-                        return;
-
-                    try
+                    //Pattern matching for message text
+                    if (BaseHandler.MatchMethod(method, messageEventArgs.Message.Text))
                     {
-                        //Get and send chatAction from attributes
-                        var chatAction = BaseHandler.GetChatActionAttributes(method);
-                        if (chatAction.HasValue)
-                            await Bot.SendChatActionAsync(chatId, chatAction.Value);
+                        //Check user access by role
+                        if (!BaseHandler.ValidateAccess(method, user))
+                            return;
 
-                        //Cast handler object
-                        var handler = Activator.CreateInstance(handlerType);
+                        try
+                        {
+                            //Get and send chatAction from attributes
+                            var chatAction = BaseHandler.GetChatActionAttributes(method);
+                            if (chatAction.HasValue)
+                                await Bot.SendChatActionAsync(chatId, chatAction.Value);
 
-                        //Set params
-                        ((BaseHandler)handler).Init(Bot, user, messageEventArgs);
+                            //Cast handler object
+                            var handler = Activator.CreateInstance(handlerType);
 
-                        //Invoke method
-                        method.Invoke(handler, parameters: new object[] { });
+                            //Set params
+                            ((BaseHandler)handler).Init(Bot, user, messageEventArgs);
+
+                            //Invoke method
+                            method.Invoke(handler, parameters: new object[] { });
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex, "Invoker error");
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Debug.WriteLine(ex, "Invoker error");
+                        //Cant find method
+                        Debug.WriteLine($"Can't find method for *{messageEventArgs.Message.Text}*");
                     }
-                }
-                else
-                {
-                    //Cant find method
-                    Debug.WriteLine($"Can't find method *{methodName}*");
                 }
             }
         }

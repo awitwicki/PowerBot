@@ -1,6 +1,7 @@
 ﻿using PowerBot.Core.Models;
 using System;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
@@ -46,6 +47,15 @@ namespace PowerBot.Core
             }
         }
 
+        public class MessagePattern : Attribute
+        {
+            public string Pattern { get; set; }
+            public MessagePattern(string pattern)
+            {
+                this.Pattern = pattern;
+            }
+        }
+
         //Attribute validators
         //Validate user access role
         public static bool ValidateAccess(MethodInfo methodInfo, PowerBot.Core.Models.User user)
@@ -83,6 +93,27 @@ namespace PowerBot.Core
             }
 
             return null;
+        }
+
+        //Match message text with method
+        public static bool MatchMethod(MethodInfo methodInfo, string messageText)
+        {
+            Object[] attributes = methodInfo.GetCustomAttributes(true);
+
+            //find and return chatAction
+            foreach (var attribute in attributes)
+            {
+                if (attribute.GetType() == typeof(MessagePattern))
+                {
+                    var pattern = ((MessagePattern)attribute).Pattern;
+
+                    //regex match
+                    Match m = Regex.Match(messageText, pattern, RegexOptions.IgnoreCase);
+                    return m.Success;
+                }
+            }
+
+            return false;
         }
     }
 }
