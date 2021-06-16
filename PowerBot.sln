@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerBot.Core", "PowerBot.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerBot.Web", "PowerBot.Web\PowerBot.Web.csproj", "{CF4D5AEC-D9EC-4ACE-AE1C-61F6EA7EF1B0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSample", "ConsoleSample\ConsoleSample.csproj", "{8495855C-B713-4629-815A-2AE0F5B57028}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{CF4D5AEC-D9EC-4ACE-AE1C-61F6EA7EF1B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF4D5AEC-D9EC-4ACE-AE1C-61F6EA7EF1B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF4D5AEC-D9EC-4ACE-AE1C-61F6EA7EF1B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8495855C-B713-4629-815A-2AE0F5B57028}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8495855C-B713-4629-815A-2AE0F5B57028}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8495855C-B713-4629-815A-2AE0F5B57028}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8495855C-B713-4629-815A-2AE0F5B57028}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

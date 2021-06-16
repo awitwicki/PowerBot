@@ -10,10 +10,14 @@ namespace PowerBot.Core
     {
         public static IEnumerable<Type> GetEnumerableOfType<T>() where T : class
         {
-            List<Type> classes = Assembly.GetAssembly(typeof(T))
-                .GetTypes()
-                .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))
-                .ToList();
+            List<Type> classes = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .ToList()
+                .SelectMany(x =>
+                    x.GetTypes()
+                        .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))
+                        .ToList()
+                ).ToList();
 
             return classes;
         }
