@@ -1,5 +1,5 @@
 ﻿using System;
-using PowerBot.Core;
+using PowerBot.Web;
 
 namespace ConsoleSample
 {
@@ -12,7 +12,7 @@ namespace ConsoleSample
             PowerBotBuilder
                 .BuildPowerBot()
                 .WithAccessToken("TELEGRAM_BOT_TOKEN")
-                .StartSyncrously();
+                .StartWithWebServer();
         }
     }
 }

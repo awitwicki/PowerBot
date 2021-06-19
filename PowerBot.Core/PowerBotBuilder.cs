@@ -34,7 +34,7 @@ namespace PowerBot.Core
             return this;
         }
 
-        public void StartSyncrously()
+        public void StartSynchronously()
         {
             PowerbotCore
                 .StartAsync(new System.Threading.CancellationToken())

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PowerBot.Core\PowerBot.Core.csproj" />
+    <ProjectReference Include="..\PowerBot.Web\PowerBot.Web.csproj" />
   </ItemGroup>
 
 </Project>

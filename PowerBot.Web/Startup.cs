@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using PowerBot.Core;
-using PowerBot.Web.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +48,15 @@ namespace PowerBot.Web
             }
 
             app.UseHttpsRedirection();
+
+            //Serve static files from embedded resources
+            var manifestEmbeddedProvider =
+                new ManifestEmbeddedFileProvider(typeof(Program).Assembly, "wwwroot/");
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = manifestEmbeddedProvider
+            });
             app.UseStaticFiles();
 
             app.UseRouting();
