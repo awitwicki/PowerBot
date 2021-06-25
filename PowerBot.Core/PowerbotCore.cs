@@ -27,9 +27,9 @@ namespace PowerBot.Core
         {
             if (TelegramAccessToken == null)
             {
-                var TelegramAccessToken = Environment.CurrentDirectory = Environment.GetEnvironmentVariable(AccessTokenEnvName);
+                var TelegramAccessToken = Environment.GetEnvironmentVariable(AccessTokenEnvName);
                 if (TelegramAccessToken == null)
-                    throw new InvalidOperationException("Can't find TelegramAccessToken");
+                    throw new InvalidOperationException($"Can't find environment variable {AccessTokenEnvName}");
             }
 
             Bot = new TelegramBotClient(TelegramAccessToken);

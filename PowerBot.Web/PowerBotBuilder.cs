@@ -15,13 +15,23 @@ namespace PowerBot.Web
 
         public static IHostBuilder WithAccessToken(this IHostBuilder host, string accessToken)
         {
-            //do nothing
+            host.ConfigureAppConfiguration((context, config) =>
+                {
+                    var settings = config.Build();
+                    settings["TelegramAccessToken"] = accessToken;
+                });
+            
             return host;
         }
 
         public static IHostBuilder WithAccessTokenEnv(this IHostBuilder host, string accessTokenEnvName)
         {
-            //do nothing
+            host.ConfigureAppConfiguration((context, config) =>
+            {
+                var settings = config.Build();
+                settings["TelegramAccessTokenEnvName"] = accessTokenEnvName;
+            });
+
             return host;
         }
 

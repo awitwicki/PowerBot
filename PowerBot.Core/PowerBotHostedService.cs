@@ -39,6 +39,10 @@ namespace PowerBot.Core
             if (token != null)
                 PowerbotCore.TelegramAccessToken = token;
 
+            var tokenEnvName = _configuration["TelegramAccessTokenEnvName"];
+            if (tokenEnvName != null)
+                PowerbotCore.AccessTokenEnvName = tokenEnvName;
+
             PowerbotCore.StartAsync(stoppingToken);
             return Task.CompletedTask;
         }
