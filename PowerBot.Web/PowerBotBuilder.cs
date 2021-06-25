@@ -27,10 +27,10 @@ namespace PowerBot.Web
         public static IHostBuilder WithAccessTokenEnv(this IHostBuilder host, string accessTokenEnvName)
         {
             host.ConfigureAppConfiguration((context, config) =>
-            {
-                var settings = config.Build();
-                settings["TelegramAccessTokenEnvName"] = accessTokenEnvName;
-            });
+                {
+                    var settings = config.Build();
+                    settings["TelegramAccessTokenEnvName"] = accessTokenEnvName;
+                });
 
             return host;
         }

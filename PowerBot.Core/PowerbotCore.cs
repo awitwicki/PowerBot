@@ -1,4 +1,5 @@
 ﻿using PowerBot.Core.Managers;
+using PowerBot.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -69,6 +70,9 @@ namespace PowerBot.Core
 
         private async Task MessageInvoker(MessageEventArgs messageEventArgs)
         {
+            //Log stats
+            await StatsManager.AddStatAction(ActionType.Message);
+
             //Get message data
             var chatId = messageEventArgs.Message.Chat.Id;
             var user = await UserManager.AddOrUpdateUser(messageEventArgs);
@@ -109,6 +113,9 @@ namespace PowerBot.Core
                         catch (Exception ex)
                         {
                             Debug.WriteLine(ex, "Invoker error");
+                            
+                            //Log stats
+                            await StatsManager.AddStatAction(ActionType.Error);
                         }
                     }
                     else
@@ -145,6 +152,11 @@ namespace PowerBot.Core
 
         private void BotOnReceiveError(object sender, ReceiveErrorEventArgs receiveErrorEventArgs)
         {
+            //Log stats
+            StatsManager.AddStatAction(ActionType.Error)
+                .GetAwaiter()
+                .GetResult();
+
             Debug.WriteLine(receiveErrorEventArgs.ApiRequestException.ErrorCode);
             Debug.WriteLine(receiveErrorEventArgs.ApiRequestException.Message);
         }

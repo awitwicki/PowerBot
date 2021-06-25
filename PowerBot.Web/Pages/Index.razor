@@ -1,7 +1,25 @@
 ﻿@page "/"
+@using PowerBot.Core.Managers
+
 
 <h1>PowerBot</h1>
 
-Welcome to your new bot app.
+<b>@todayCount</b> bot actions was today.
+
+<div id="chart">
+
+</div>
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+
+    public int todayCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var stats = await StatsManager.GetStats(DateTime.Today, DateTime.Today.AddDays(1));
+
+        todayCount = stats.Count;
+    }
+}
