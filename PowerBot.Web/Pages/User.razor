@@ -35,13 +35,14 @@
 
 @if (showModal)
 {
-    <div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
-        <div class="modal-dialog">
+    <div class="modal fade show" aria-modal="true" role="dialog" @onclick="@ModalCancel">
+
+        <div class="modal-dialog" @onclick:stopPropagation="true">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Confirm action</h4>
+                    <h4 class="modal-title">Edit User</h4>
                     <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
                 </div>
 

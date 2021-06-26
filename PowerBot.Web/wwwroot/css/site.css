@@ -42,26 +42,40 @@ a, .btn-link {
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
 
 /*
     TODO:
     fix that
 */
 
+.img-logo {
+    height: 60px;
+    padding: 15px;
+}
+
+.modal {
+    background: #00000085;
+    backdrop-filter: blur(4px);
+    filter: none !important;
+    display: block;
+}
+
+.modal-background {
+    width: 100%;
+    height: 100%;
+    filter: blur();
+}
+
 .page {
     position: relative;
     display: flex;
     flex-direction: column;
-}
-
-.main {
-    flex: 1;
 }
 
 .sidebar {
@@ -69,71 +83,34 @@ a, .btn-link {
 }
 
 .top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
+    background-color: rgba(0,0,0,0.4);
     justify-content: flex-end;
     height: 3.5rem;
     display: flex;
     align-items: center;
 }
-
-    .top-row a, .top-row .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-    }
-
-    .top-row a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-@media (max-width: 640.98px) {
-    .top-row:not(.auth) {
-        display: none;
-    }
-
-    .top-row.auth {
-        justify-content: space-between;
-    }
-
-    .top-row a, .top-row .btn-link {
-        margin-left: 0;
-    }
+    
+.top-row a, .top-row .btn-link {
+    white-space: nowrap;
+    margin-left: 1.5rem;
 }
 
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-    }
-
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
-
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .main > div {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
+.top-row a:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+.main {
+    flex: 1;
+}
 
+.main .top-row {
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #d6d5d5;
+}
 
 .navbar-toggler {
     background-color: rgba(255, 255, 255, 0.1);
-}
-
-.top-row {
-    height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
 }
 
 .navbar-brand {
@@ -179,50 +156,6 @@ a, .btn-link {
             color: white;
         }
 
-@media (min-width: 641px) {
-    .navbar-toggler {
-        display: none;
-    }
-
-    .collapse {
-        /* Never collapse the sidebar for wide screens */
-        display: block;
-    }
-}
-
-.page {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-
-.main {
-    flex: 1;
-}
-
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-}
-
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-}
-
-    .top-row a, .top-row .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-    }
-
-    .top-row a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
 @media (max-width: 640.98px) {
     .top-row:not(.auth) {
         display: none;
@@ -260,59 +193,6 @@ a, .btn-link {
         padding-right: 1.5rem !important;
     }
 }
-
-
-.navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.top-row {
-    height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
-}
-
-.navbar-brand {
-    font-size: 1.1rem;
-}
-
-.oi {
-    width: 2rem;
-    font-size: 1.1rem;
-    vertical-align: text-top;
-    top: -2px;
-}
-
-.nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
-}
-
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-    }
-
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
-    }
-
-    .nav-item a {
-        color: #d7d7d7;
-        border-radius: 4px;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        line-height: 3rem;
-    }
-
-        .nav-item a.active {
-            background-color: rgba(255,255,255,0.25);
-            color: white;
-        }
-
-        .nav-item a:hover {
-            background-color: rgba(255,255,255,0.1);
-            color: white;
-        }
 
 @media (min-width: 641px) {
     .navbar-toggler {
