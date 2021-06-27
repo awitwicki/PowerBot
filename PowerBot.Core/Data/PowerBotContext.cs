@@ -10,6 +10,7 @@ namespace PowerBot.Core.Data
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Stats> Stats { get; set; }
+        public DbSet<Log> Logs { get; set; }
 
         public PowerBotContext()
         {

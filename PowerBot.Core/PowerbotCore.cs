@@ -24,7 +24,7 @@ namespace PowerBot.Core
 
         public PowerbotCore() { }
 
-        public Task StartAsync(CancellationToken stoppingToken)
+        public async Task StartAsync(CancellationToken stoppingToken)
         {
             if (TelegramAccessToken == null)
             {
@@ -37,7 +37,8 @@ namespace PowerBot.Core
             StartBotAsync();
             Started = true;
 
-            return Task.CompletedTask;
+            Console.WriteLine("Bot started");
+            await LogsManager.CreateLog($"Bot started", LogLevel.Info);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -112,8 +113,9 @@ namespace PowerBot.Core
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine(ex, "Invoker error");
-                            
+                            Console.WriteLine(ex.Message, "Invoker error");
+                            await LogsManager.CreateLog($"Invoker error *{ex.Message}*", LogLevel.Critical);
+
                             //Log stats
                             await StatsManager.AddStatAction(ActionType.Error);
                         }
@@ -121,7 +123,8 @@ namespace PowerBot.Core
                     else
                     {
                         //Cant find method
-                        Debug.WriteLine($"Can't find method for *{messageEventArgs.Message.Text}*");
+                        //await LogsManager.CreateLog($"Can't find method for *{messageEventArgs.Message.Text}*", LogLevel.Warning);
+                        //Console.WriteLine($"Can't find method for *{messageEventArgs.Message.Text}*");
                     }
                 }
             }

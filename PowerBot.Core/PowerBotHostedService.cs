@@ -31,7 +31,7 @@ namespace PowerBot.Core
             _configuration = configuration;
         }
 
-        public Task StartAsync(CancellationToken stoppingToken)
+        public async Task StartAsync(CancellationToken stoppingToken)
         {
             PowerbotCore = new PowerbotCore();
 
@@ -43,8 +43,7 @@ namespace PowerBot.Core
             if (tokenEnvName != null)
                 PowerbotCore.AccessTokenEnvName = tokenEnvName;
 
-            PowerbotCore.StartAsync(stoppingToken);
-            return Task.CompletedTask;
+            await PowerbotCore.StartAsync(stoppingToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

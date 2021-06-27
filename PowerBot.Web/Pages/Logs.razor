@@ -1,0 +1,47 @@
+﻿@page "/logs"
+
+@using PowerBot.Core.Managers
+@using PowerBot.Core.Models
+
+<h1>Bot Logs</h1>
+
+@if (logs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>DateTime</th>
+                <th>LogLevel</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in logs)
+            {
+                <tr class="@GetLogLevelClass(log.LogLevel)">
+                    <td>@log.DateTime</td>
+                    <td>@log.LogLevel</td>
+                    <td>@log.MessageText</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Log> logs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        logs = await LogsManager.GetLogs();
+    }
+
+    public string GetLogLevelClass(LogLevel logLevel)
+    {
+        return "log-level-" + logLevel.ToString();
+    }
+}

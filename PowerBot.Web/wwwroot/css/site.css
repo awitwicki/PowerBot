@@ -54,6 +54,38 @@ a, .btn-link {
     fix that
 */
 
+.log-level-Info {
+    background: #28a74596;
+}
+
+    .log-level-Info:hover {
+        background: #28a745c9;
+    }
+
+.log-level-Debug {
+    background: #0259ff63;
+}
+
+    .log-level-Debug:hover {
+        background: #0259ff85;
+    }
+
+.log-level-Warning {
+    background: #ffc1078f;
+}
+
+    .log-level-Warning:hover {
+        background: #ffc107;
+    }
+
+.log-level-Critical {
+    background: #dc35457a;
+}
+
+    .log-level-Critical:hover {
+        background: #dc3545;
+    }
+
 .img-logo {
     height: 60px;
     padding: 15px;

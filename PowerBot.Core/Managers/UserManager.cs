@@ -50,6 +50,9 @@ namespace PowerBot.Core.Managers
 
                 var usrEntity = await _dbContext.Users.AddAsync(user);
                 usr = usrEntity.Entity;
+
+                Console.WriteLine($"New user ({user.FullName})");
+                await LogsManager.CreateLog($"New user ({user.FullName})", LogLevel.Info);
             }
             // Update User
             else
