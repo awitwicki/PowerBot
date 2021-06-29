@@ -96,6 +96,12 @@ a, .btn-link {
     backdrop-filter: blur(4px);
     filter: none !important;
     display: block;
+    transition: all 250ms;
+}
+
+.modal-dialog {
+    top: 50%;
+    transform: translateY(-60%) !important;
 }
 
 .modal-background {

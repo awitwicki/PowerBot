@@ -33,41 +33,33 @@
 <br />
 <button @onclick="SendMessage" class="btn btn-success">Send message</button>
 
-@if (showModal)
-{
-    <div class="modal fade show" aria-modal="true" role="dialog" @onclick="@ModalCancel">
-
-        <div class="modal-dialog" @onclick:stopPropagation="true">
-            <div class="modal-content">
-
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Edit User</h4>
-                    <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
-                </div>
-
-                <!-- Modal body -->
-                <div class="modal-body">
-                    <p>This is the modal content!</p>
-                    <label for="pwd">User Access:</label>
-                    <select @bind="newUserAccess" class="form-control">
-                        @foreach (var access in Enum.GetValues(typeof(UserAccess)))
-                        {
-                            <option value="@access">@access</option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Modal footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn" @onclick="@ModalCancel">Cancel</button>
-                    <button type="button" class="btn btn-success" @onclick=@ModalOk>Save</button>
-                </div>
-
+<!-- Edit User modal -->
+<div class="modal" style="@ModalStyle()" aria-modal="true" role="dialog" @onclick="@ModalCancel">
+    <div class="modal-dialog" @onclick:stopPropagation="true">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Edit User</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <label for="pwd">User Access:</label>
+                <select @bind="newUserAccess" class="form-control">
+                    @foreach (var access in Enum.GetValues(typeof(UserAccess)))
+                    {
+                        <option value="@access">@access</option>
+                    }
+                </select>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn" @onclick="@ModalCancel">Cancel</button>
+                <button type="button" class="btn btn-success" @onclick=@ModalOk>Save</button>
             </div>
         </div>
     </div>
-}
+</div>
 
 @code {
     [Parameter]
@@ -112,6 +104,14 @@
 
     private List<PowerBot.Core.Models.User> users;
     private bool showModal = false;
+
+    private string ModalStyle()
+    {
+        if (showModal)
+            return "opacity: 1; visibility: visible";
+        else
+            return "opacity: 0; visibility: hidden";
+    }
 
     private UserAccess newUserAccess;
     private int userId;
