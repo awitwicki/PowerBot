@@ -21,6 +21,7 @@ namespace PowerBot.Web
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStaticWebAssets();
                 });
     }
 }

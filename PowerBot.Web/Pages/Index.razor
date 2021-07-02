@@ -1,11 +1,29 @@
 ﻿@page "/"
-@using PowerBot.Core.Managers
 
+@using PowerBot.Core.Managers
+@using PowerBot.Core.Models
 
 <h1>PowerBot</h1>
 
 <b>@todayCount</b> bot actions was today.
 
+<div class="row">
+    <div class="col-md-6 col-sm-12 p-4">
+        <RadzenChart>
+            <RadzenLineSeries Data="@messages" CategoryProperty="Date" Title="Messages" LineType="LineType.Dashed" ValueProperty="Count">
+                <RadzenMarkers MarkerType="MarkerType.Circle" />
+            </RadzenLineSeries>
+            <RadzenLineSeries Data="@errors" CategoryProperty="Date" Title="Errors" ValueProperty="Count">
+                <RadzenMarkers MarkerType="MarkerType.Circle" />
+            </RadzenLineSeries>
+            <RadzenCategoryAxis Padding="20" FormatString="{0:MM.dd.yyyy}" />
+            <RadzenValueAxis>
+                <RadzenGridLines Visible="true" />
+                <RadzenAxisTitle Text="User actions" />
+            </RadzenValueAxis>
+        </RadzenChart>
+    </div>
+</div>
 
 <SurveyPrompt Title="How is Blazor working for you?" />
 
@@ -15,8 +33,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var stats = await StatsManager.GetStats(DateTime.Today, DateTime.Today.AddDays(1));
+        messages = await StatsManager.GetAggregatedStats(ActionType.Message, DateTime.UtcNow.Date.AddDays(-5), DateTime.UtcNow.Date.AddDays(1), TimeRangeAggregationTypes.Daily);
+        errors = await StatsManager.GetAggregatedStats(ActionType.Error, DateTime.UtcNow.Date.AddDays(-5), DateTime.UtcNow.Date.AddDays(1), TimeRangeAggregationTypes.Daily);
 
-        todayCount = stats.Count;
+        todayCount = (await StatsManager.GetStats(DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(1))).Count;
     }
+
+    DataItem[] messages = new DataItem[] { };
+    DataItem[] errors = new DataItem[] { };
+
 }

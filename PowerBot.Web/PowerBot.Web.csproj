@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.7" />
+    <PackageReference Include="Radzen.Blazor" Version="3.6.1" />
   </ItemGroup>
 
 </Project>
