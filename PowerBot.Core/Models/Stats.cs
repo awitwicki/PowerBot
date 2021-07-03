@@ -11,6 +11,12 @@ namespace PowerBot.Core.Models
         public ActionType ActionType { get; set; }
     }
 
+    public class AggregatedStat
+    {
+        public DateTime DateTime { get; set; }
+        public int Count { get; set; }
+    }
+
     public enum ActionType
     {
         Message,
