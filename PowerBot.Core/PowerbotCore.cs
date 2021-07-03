@@ -78,6 +78,10 @@ namespace PowerBot.Core
             var chatId = messageEventArgs.Message.Chat.Id;
             var user = await UserManager.AddOrUpdateUser(messageEventArgs);
 
+            if (messageEventArgs.Message.Chat.Type == ChatType.Supergroup ||
+                messageEventArgs.Message.Chat.Type == ChatType.Group)
+                await ChatManager.AddOrUpdateChat(messageEventArgs);
+
             //Get all handlers
             var handlers = ReflectiveEnumerator.GetEnumerableOfType<BaseHandler>();
 

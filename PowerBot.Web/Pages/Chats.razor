@@ -1,0 +1,42 @@
+﻿@page "/chats"
+
+@using PowerBot.Core.Models
+@using PowerBot.Core.Managers
+
+<h1>List of all stored bot users</h1>
+
+@if (chats == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Chat Id</th>
+                <th>Title</th>
+                <th>Active At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var chat in chats)
+            {
+                <tr>
+                    <td>@chat.Id</td>
+                    <td>@chat.Title</td>
+                    <td>@chat.ActiveAt</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Chat> chats;
+
+    protected override async Task OnInitializedAsync()
+    {
+        chats = await ChatManager.GetChats();
+    }
+}
