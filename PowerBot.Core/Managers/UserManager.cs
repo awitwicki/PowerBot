@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types;
 
 namespace PowerBot.Core.Managers
 {
@@ -13,37 +14,37 @@ namespace PowerBot.Core.Managers
     {
         public static PowerBotContext _dbContext = new PowerBotContext();
 
-        public static async Task<User> GetUser(int id)
+        public static async Task<PowerbotUser> GetUser(long id)
         {
             var user = await _dbContext.Users.FindAsync(id);
             return user;
         }
         
-        public static async Task<List<User>> GetUsers()
+        public static async Task<List<PowerbotUser>> GetUsers()
         {
             var users = await _dbContext.Users.ToListAsync();
             return users;
         }
 
-        public static async Task<User> GetUserByTelegamId(int id)
+        public static async Task<PowerbotUser> GetUserByTelegamId(long id)
         {
             var user = await _dbContext.Users.SingleOrDefaultAsync(x => x.TelegramId == id);
             return user;
         }
 
-        public static async Task<User> AddOrUpdateUser(MessageEventArgs message)
+        public static async Task<PowerbotUser> AddOrUpdateUser(Message message)
         {
-            var usr = await GetUserByTelegamId(message.Message.From.Id);
+            var usr = await GetUserByTelegamId(message.From.Id);
 
             // New user
             if (usr == null)
             {
-                User user = new User
+                PowerbotUser user = new PowerbotUser
                 {
-                    TelegramId = message.Message.From.Id,
-                    FirstName = message.Message.From.FirstName,
-                    LastName = message.Message.From.LastName,
-                    UserName = message.Message.From.Username,
+                    TelegramId = message.From.Id,
+                    FirstName = message.From.FirstName,
+                    LastName = message.From.LastName,
+                    UserName = message.From.Username,
                     ActiveAt = DateTime.UtcNow,
                     UserAccess = UserAccess.User
                 };
@@ -57,9 +58,9 @@ namespace PowerBot.Core.Managers
             // Update User
             else
             {
-                usr.FirstName = message.Message.From.FirstName;
-                usr.LastName = message.Message.From.LastName;
-                usr.UserName = message.Message.From.Username;
+                usr.FirstName = message.From.FirstName;
+                usr.LastName = message.From.LastName;
+                usr.UserName = message.From.Username;
                 usr.ActiveAt = DateTime.UtcNow;
             }
 
@@ -68,13 +69,13 @@ namespace PowerBot.Core.Managers
             return usr;
         }
 
-        public static async Task UpdateUser(User user)
+        public static async Task UpdateUser(PowerbotUser user)
         {
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();
         }
 
-        public static async Task UpdateUserAccess(int userId, UserAccess userAccess)
+        public static async Task UpdateUserAccess(long userId, UserAccess userAccess)
         {
             var user = await GetUser(userId);
             user.UserAccess = userAccess;

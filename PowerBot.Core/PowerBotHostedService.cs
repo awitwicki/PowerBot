@@ -46,10 +46,9 @@ namespace PowerBot.Core
             await PowerbotCore.StartAsync(stoppingToken);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            PowerbotCore.StopAsync(cancellationToken);
-            return Task.CompletedTask;
+            await PowerbotCore.StopAsync(cancellationToken);
         }
     }
 }

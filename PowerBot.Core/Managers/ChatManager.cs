@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types;
 
 namespace PowerBot.Core.Managers
 {
@@ -13,29 +14,29 @@ namespace PowerBot.Core.Managers
     {
         public static PowerBotContext _dbContext = new PowerBotContext();
 
-        public static async Task<Chat> GetChat(long id)
+        public static async Task<PowerBotChat> GetChat(long id)
         {
             var chat = await _dbContext.Chats.FindAsync(id);
             return chat;
         }
 
-        public static async Task<List<Chat>> GetChats()
+        public static async Task<List<PowerBotChat>> GetChats()
         {
             var chats = await _dbContext.Chats.ToListAsync();
             return chats;
         }
 
-        public static async Task<Chat> AddOrUpdateChat(MessageEventArgs message)
+        public static async Task<PowerBotChat> AddOrUpdateChat(Message message)
         {
-            var chatFromDb = await GetChat(message.Message.Chat.Id);
+            var chatFromDb = await GetChat(message.Chat.Id);
 
             // New Сhat
             if (chatFromDb == null)
             {
-                Chat chat = new Chat
+                var chat = new PowerBot.Core.Models.PowerBotChat
                 {
-                    Id = message.Message.Chat.Id,
-                    Title = message.Message.Chat.Title,
+                    Id = message.Chat.Id,
+                    Title = message.Chat.Title,
                     ActiveAt = DateTime.UtcNow,
                 };
 
@@ -48,7 +49,7 @@ namespace PowerBot.Core.Managers
             // Update Сhat
             else
             {
-                chatFromDb.Title = message.Message.From.FirstName;
+                chatFromDb.Title = message.From.FirstName;
                 chatFromDb.ActiveAt = DateTime.UtcNow;
             }
 
@@ -57,7 +58,7 @@ namespace PowerBot.Core.Managers
             return chatFromDb;
         }
 
-        public static async Task UpdateChat(Chat chat)
+        public static async Task UpdateChat(PowerBotChat chat)
         {
             _dbContext.Update(chat);
             await _dbContext.SaveChangesAsync();

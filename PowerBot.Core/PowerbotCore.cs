@@ -1,4 +1,5 @@
-﻿using PowerBot.Core.Managers;
+﻿using Microsoft.Extensions.Configuration;
+using PowerBot.Core.Managers;
 using PowerBot.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Exceptions;
+using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace PowerBot.Core
@@ -16,6 +20,7 @@ namespace PowerBot.Core
     public class PowerbotCore
     {
         private static TelegramBotClient Bot { get; set; }
+        private CancellationTokenSource cts { get; set; }
         public TelegramBotClient BotClient => Bot;
 
         public static bool Started { get; set; } = false;
@@ -23,6 +28,13 @@ namespace PowerBot.Core
         public string TelegramAccessToken { get; set; }
 
         public PowerbotCore() { }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            cts.Cancel();
+
+            return Task.CompletedTask;
+        }
 
         public async Task StartAsync(CancellationToken stoppingToken)
         {
@@ -41,46 +53,83 @@ namespace PowerBot.Core
             await LogsManager.CreateLog($"Bot started", LogLevel.Info);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            Bot.StopReceiving();
-
-            return Task.CompletedTask;
-        }
+        
 
         public void StartBotAsync()
         {
-            Bot.OnMessage += BotOnMessageReceived;
-            Bot.OnReceiveError += BotOnReceiveError;
+            using var cts = new CancellationTokenSource();
 
-            //Start listening
-            Bot.StartReceiving(Array.Empty<UpdateType>());
+            // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
+            Bot.StartReceiving(new DefaultUpdateHandler(HandleUpdateAsync, HandleErrorAsync), cts.Token);
+
+            Console.WriteLine($"Start listening for @{Bot.GetMeAsync().Result.Username}");
         }
 
-        async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            var message = messageEventArgs.Message;
+            Task handler = update.Type switch
+            {
+                UpdateType.Message => BotOnMessageReceived(botClient, update.Message),
+                //UpdateType.EditedMessage => BotOnMessageReceived(botClient, update.EditedMessage),
+                //UpdateType.CallbackQuery => BotOnCallbackQueryReceived(botClient, update.CallbackQuery),
+                //UpdateType.InlineQuery => BotOnInlineQueryReceived(botClient, update.InlineQuery),
+                //UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(botClient, update.ChosenInlineResult),
+                _ => UnknownUpdateHandlerAsync(botClient, update)
+            };
 
-            var checkMessageResult = await CheckMessage(messageEventArgs);
+            try
+            {
+                await handler;
+            }
+            catch (Exception exception)
+            {
+                await HandleErrorAsync(botClient, exception, cancellationToken);
+            }
+        }
+
+        public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        {
+            var ErrorMessage = exception switch
+            {
+                ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+                _ => exception.ToString()
+            };
+
+            //Log stats
+            await StatsManager.AddStatAction(ActionType.Error);
+            await LogsManager.CreateLog(ErrorMessage, LogLevel.Critical);
+
+            Debug.WriteLine(exception.Message);
+        }
+
+        async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
+        {
+            var checkMessageResult = await CheckMessage(message);
             if (!checkMessageResult)
                 return;
 
             if (message.Text != null)
-                await MessageInvoker(messageEventArgs);
+                await MessageInvoker(message);
         }
 
-        private async Task MessageInvoker(MessageEventArgs messageEventArgs)
+        private Task UnknownUpdateHandlerAsync(ITelegramBotClient botClient, Update update)
+        {
+            Console.WriteLine($"Unknown update type: {update.Type}");
+            return Task.CompletedTask;
+        }
+
+        private async Task MessageInvoker(Message message)
         {
             //Log stats
             await StatsManager.AddStatAction(ActionType.Message);
 
             //Get message data
-            var chatId = messageEventArgs.Message.Chat.Id;
-            var user = await UserManager.AddOrUpdateUser(messageEventArgs);
+            var chatId = message.Chat.Id;
+            var user = await UserManager.AddOrUpdateUser(message);
 
-            if (messageEventArgs.Message.Chat.Type == ChatType.Supergroup ||
-                messageEventArgs.Message.Chat.Type == ChatType.Group)
-                await ChatManager.AddOrUpdateChat(messageEventArgs);
+            if (message.Chat.Type == ChatType.Supergroup ||
+                message.Chat.Type == ChatType.Group)
+                await ChatManager.AddOrUpdateChat(message);
 
             //Get all handlers
             var handlers = ReflectiveEnumerator.GetEnumerableOfType<BaseHandler>();
@@ -93,7 +142,7 @@ namespace PowerBot.Core
                 foreach (var method in handlerMethods)
                 {
                     //Pattern matching for message text
-                    if (BaseHandler.MatchMethod(method, messageEventArgs.Message.Text))
+                    if (BaseHandler.MatchMethod(method, message.Text))
                     {
                         //Check user access by role
                         if (!BaseHandler.ValidateAccess(method, user))
@@ -110,7 +159,7 @@ namespace PowerBot.Core
                             var handler = Activator.CreateInstance(handlerType);
 
                             //Set params
-                            ((BaseHandler)handler).Init(Bot, user, messageEventArgs);
+                            ((BaseHandler)handler).Init(Bot, user, message);
 
                             //Invoke method
                             await (Task)method.Invoke(handler, parameters: new object[] { });
@@ -134,20 +183,21 @@ namespace PowerBot.Core
             }
         }
 
-        private async Task<bool> CheckMessage(MessageEventArgs messageEventArgs)
+        private async Task<bool> CheckMessage(Message message)
         {
             // Process user in db
-            var user = await UserManager.AddOrUpdateUser(messageEventArgs);
+            var user = await UserManager.AddOrUpdateUser(message);
 
             //Filters for messages
-            if (messageEventArgs != null)
+            if (message != null)
             {
-                var message = messageEventArgs.Message;
-                if (message == null || (message.Type != MessageType.Text && message.Type != MessageType.Document)) return false;
+                //Specific filter messages
+                //var msg = message.Text;
+                //if (msg == null || (message.Type != MessageType.Text && message.Type != MessageType.Document)) return false;
 
                 //Ignore old messages
-                if (message.Date.AddMinutes(1) < DateTime.UtcNow)
-                    return false;
+                //if (message.Date.AddMinutes(1) < DateTime.UtcNow)
+                //    return false;
             }
 
             //Authorize User (if user banned - ignore)
@@ -155,17 +205,6 @@ namespace PowerBot.Core
                 return false;
 
             return true;
-        }
-
-        private void BotOnReceiveError(object sender, ReceiveErrorEventArgs receiveErrorEventArgs)
-        {
-            //Log stats
-            StatsManager.AddStatAction(ActionType.Error)
-                .GetAwaiter()
-                .GetResult();
-
-            Debug.WriteLine(receiveErrorEventArgs.ApiRequestException.ErrorCode);
-            Debug.WriteLine(receiveErrorEventArgs.ApiRequestException.Message);
         }
     }
 }

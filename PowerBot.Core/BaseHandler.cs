@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace PowerBot.Core
@@ -11,21 +12,15 @@ namespace PowerBot.Core
     public abstract class BaseHandler
     {
         public TelegramBotClient Bot { get; set; }
-        public PowerBot.Core.Models.User User { get; set; }
-        public MessageEventArgs MessageEventArgs { get; set; }
-        public int MessageId => MessageEventArgs.Message.From.Id;
-        public long ChatId => MessageEventArgs.Message.Chat.Id;
-        public void Init(TelegramBotClient bot, PowerBot.Core.Models.User user, MessageEventArgs messageEventArgs)
+        public PowerBot.Core.Models.PowerbotUser User { get; set; }
+        public Message Message { get; set; }
+        public long MessageId => Message.From.Id;
+        public long ChatId => Message.Chat.Id;
+        public void Init(TelegramBotClient bot, PowerbotUser user, Message message)
         {
             Bot = bot;
             User = user;
-            MessageEventArgs = messageEventArgs;
-        }
-
-        public async virtual void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
-        {
-            //do nothing
-            Console.WriteLine("Background on message received");
+            Message = message;
         }
 
         //Methods attributes
@@ -58,7 +53,7 @@ namespace PowerBot.Core
 
         //Attribute validators
         //Validate user access role
-        public static bool ValidateAccess(MethodInfo methodInfo, PowerBot.Core.Models.User user)
+        public static bool ValidateAccess(MethodInfo methodInfo, PowerbotUser user)
         {
             Object[] attributes = methodInfo.GetCustomAttributes(true);
 

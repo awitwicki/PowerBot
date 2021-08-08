@@ -4,9 +4,9 @@ using System.Text;
 
 namespace PowerBot.Core.Models
 {
-    public class User
+    public class PowerbotUser
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public long TelegramId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

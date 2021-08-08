@@ -1,6 +1,7 @@
 ﻿@page "/users"
 
 @using PowerBot.Core.Managers
+@using PowerBot.Core.Models
 
 <h1>List of all stored bot users</h1>
 
@@ -38,7 +39,7 @@ else
 }
 
 @code {
-    private List<PowerBot.Core.Models.User> users;
+    private List<PowerbotUser> users;
 
     protected override async Task OnInitializedAsync()
     {
