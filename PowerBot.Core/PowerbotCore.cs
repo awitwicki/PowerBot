@@ -31,7 +31,8 @@ namespace PowerBot.Core
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            cts.Cancel();
+            if (cts != null)
+                cts.Cancel();
 
             return Task.CompletedTask;
         }

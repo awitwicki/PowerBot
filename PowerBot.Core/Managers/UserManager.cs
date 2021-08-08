@@ -26,22 +26,16 @@ namespace PowerBot.Core.Managers
             return users;
         }
 
-        public static async Task<PowerbotUser> GetUserByTelegamId(long id)
-        {
-            var user = await _dbContext.Users.SingleOrDefaultAsync(x => x.TelegramId == id);
-            return user;
-        }
-
         public static async Task<PowerbotUser> AddOrUpdateUser(Message message)
         {
-            var usr = await GetUserByTelegamId(message.From.Id);
+            var usr = await GetUser(message.From.Id);
 
             // New user
             if (usr == null)
             {
                 PowerbotUser user = new PowerbotUser
                 {
-                    TelegramId = message.From.Id,
+                    Id = message.From.Id,
                     FirstName = message.From.FirstName,
                     LastName = message.From.LastName,
                     UserName = message.From.Username,

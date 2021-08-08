@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using PowerBot.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -21,5 +22,12 @@ namespace PowerBot.Core.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite("Data Source=powerBot.db");
+    }
+    public class PowerBotContextFactory : IDesignTimeDbContextFactory<PowerBotContext>
+    {
+        public PowerBotContext CreateDbContext(string[] args)
+        {
+            return new PowerBotContext();
+        }
     }
 }

@@ -7,7 +7,6 @@ namespace PowerBot.Core.Models
     public class PowerbotUser
     {
         public long Id { get; set; }
-        public long TelegramId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string UserName { get; set; }

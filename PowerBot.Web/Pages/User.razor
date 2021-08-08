@@ -8,9 +8,7 @@
 
 <h3>User</h3>
 
-<span><b>Id</b> @user.Id</span>
-<br />
-<span><b>Telegram Id</b> @user.TelegramId</span>
+<span><b>Telegram Id</b> @user.Id</span>
 <br />
 <span><b>Username</b> <a href="http://t.me/@user.UserName">@@@user.UserName</a></span>
 <br />
@@ -88,7 +86,7 @@
             return;
         }
 
-        await powerBotService.BotClient.SendTextMessageAsync(user.TelegramId, message);
+        await powerBotService.BotClient.SendTextMessageAsync(user.Id, message);
         sendMessageSuccess = "Sent";
     }
 

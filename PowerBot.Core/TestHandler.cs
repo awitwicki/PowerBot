@@ -14,7 +14,7 @@ namespace PowerBot.Core
         [MessagePattern("/start")]
         public async Task Start()
         {
-            string messageText = $"Hi! your database id is {User.Id}, telegram id is {User.TelegramId}, chatId is {ChatId}.";
+            string messageText = $"Hi! your telegram id is {User.Id}, chatId is {ChatId}.";
             await Bot.SendTextMessageAsync(ChatId, messageText);
         }
 
