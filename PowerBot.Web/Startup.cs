@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using PowerBot.Core;
+using Radzen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,8 @@ namespace PowerBot.Web
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            services.AddScoped<NotificationService>();
 
             services.AddPowerBot();
         }

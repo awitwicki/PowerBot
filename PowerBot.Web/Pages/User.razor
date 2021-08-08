@@ -1,9 +1,11 @@
 ﻿@page "/user/{Id}"
 
+@using Radzen
 @using PowerBot.Core
 @using PowerBot.Core.Managers
 @using PowerBot.Core.Models
 
+@inject NotificationService  notificationService;
 @inject PowerBotHostedService powerBotService;
 
 <h3>User</h3>
@@ -77,17 +79,16 @@
     private string message;
     private async Task SendMessage()
     {
-        sendMessageSuccess = "";
-        sendMessageError = "";
-
         if (message == default(string))
         {
-            sendMessageError = "Message text is empty";
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Warning", Detail = "Message text is empty", Duration = 4000 });
             return;
         }
 
         await powerBotService.BotClient.SendTextMessageAsync(user.Id, message);
-        sendMessageSuccess = "Sent";
+        message = default(string);
+
+        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Message sent", Duration = 4000 });
     }
 
     //Edit user access
