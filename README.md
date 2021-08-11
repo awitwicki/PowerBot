@@ -18,8 +18,7 @@ ASP.NET Core 5.0 [Telegram bot](https://github.com/TelegramBots/Telegram.Bot) wr
         [MessagePattern("/start")]
         public async Task Start()
         {
-            string messageText = $"Hi! your database id is {User.Id}, " +
-                $"telegram id is {User.TelegramId}, chatId is {ChatId}.";
+            string messageText = $"Hi! your id is {User.TelegramId}, chatId is {ChatId}.";
             
             await Bot.SendTextMessageAsync(ChatId, messageText);
         }
@@ -57,6 +56,6 @@ Also you can use telegram access token from environment variables with default n
 ```
 ## Web admin panel
 
-Also PowerBot gives you the ability to manage your bot through a web interface. By defaults PowerBot deploys a local web server with database (SQLite). Web application is based on ASPnet Core and Blazor.
+Also PowerBot gives you the ability to manage your bot through a web interface. By defaults PowerBot deploys a local web server with database (SQLite). Web application is based on ASP.NET Core and Blazor.
 
 You can view the statistics of using the bot and edit access for your bot's users.
