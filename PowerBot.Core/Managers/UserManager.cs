@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace PowerBot.Core.Managers
 {
@@ -36,17 +37,16 @@ namespace PowerBot.Core.Managers
                 PowerbotUser user = new PowerbotUser
                 {
                     Id = message.From.Id,
+                    ActiveAt = DateTime.UtcNow,
+                    UserAccess = UserAccess.User,
                     FirstName = message.From.FirstName,
                     LastName = message.From.LastName,
-                    UserName = message.From.Username,
-                    ActiveAt = DateTime.UtcNow,
-                    UserAccess = UserAccess.User
+                    UserName = message.From.Username
                 };
 
                 var usrEntity = await _dbContext.Users.AddAsync(user);
                 usr = usrEntity.Entity;
 
-                Console.WriteLine($"New user ({user.FullName})");
                 await LogsManager.CreateLog($"New user ({user.FullName})", LogLevel.Info);
             }
             // Update User

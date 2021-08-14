@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace PowerBot.Core.Managers
 {
@@ -28,12 +29,16 @@ namespace PowerBot.Core.Managers
 
         public static async Task<PowerBotChat> AddOrUpdateChat(Message message)
         {
+            //Check if messagetype is not private
+            if (!(message.Chat.Type == ChatType.Supergroup || message.Chat.Type == ChatType.Supergroup))
+                return null;
+
             var chatFromDb = await GetChat(message.Chat.Id);
 
             // New Сhat
             if (chatFromDb == null)
             {
-                var chat = new PowerBot.Core.Models.PowerBotChat
+                var chat = new PowerBotChat
                 {
                     Id = message.Chat.Id,
                     Title = message.Chat.Title,
@@ -43,14 +48,16 @@ namespace PowerBot.Core.Managers
                 var chatEntity = await _dbContext.Chats.AddAsync(chat);
                 chatFromDb = chatEntity.Entity;
 
-                Console.WriteLine($"New Chat ({chatFromDb.Title})");
                 await LogsManager.CreateLog($"New Chat ({chatFromDb.Title})", LogLevel.Info);
             }
             // Update Сhat
             else
             {
-                chatFromDb.Title = message.From.FirstName;
-                chatFromDb.ActiveAt = DateTime.UtcNow;
+                if (message.Chat.Type == ChatType.Group || message.Chat.Type == ChatType.Supergroup)
+                {
+                    chatFromDb.Title = message.Chat.Title;
+                    chatFromDb.ActiveAt = DateTime.UtcNow;
+                };
             }
 
             await _dbContext.SaveChangesAsync();

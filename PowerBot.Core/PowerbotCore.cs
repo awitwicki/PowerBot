@@ -50,11 +50,8 @@ namespace PowerBot.Core
             StartBotAsync();
             Started = true;
 
-            Console.WriteLine("Bot started");
             await LogsManager.CreateLog($"Bot started", LogLevel.Info);
         }
-
-        
 
         public void StartBotAsync()
         {
@@ -63,7 +60,7 @@ namespace PowerBot.Core
             // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
             Bot.StartReceiving(new DefaultUpdateHandler(HandleUpdateAsync, HandleErrorAsync), cts.Token);
 
-            Console.WriteLine($"Start listening for @{Bot.GetMeAsync().Result.Username}");
+            LogsManager.CreateLogSync($"Start listening for @{Bot.GetMeAsync().Result.Username}", LogLevel.Info);
         }
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -87,6 +84,12 @@ namespace PowerBot.Core
                 await HandleErrorAsync(botClient, exception, cancellationToken);
             }
         }
+        
+        private Task UnknownUpdateHandlerAsync(ITelegramBotClient botClient, Update update)
+        {
+            Console.WriteLine($"Unknown update type: {update.Type}");
+            return Task.CompletedTask;
+        }
 
         public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
@@ -99,24 +102,17 @@ namespace PowerBot.Core
             //Log stats
             await StatsManager.AddStatAction(ActionType.Error);
             await LogsManager.CreateLog(ErrorMessage, LogLevel.Critical);
-
-            Debug.WriteLine(exception.Message);
         }
 
         async Task BotOnMessageReceived(ITelegramBotClient botClient, Message message)
         {
-            var checkMessageResult = await CheckMessage(message);
-            if (!checkMessageResult)
-                return;
+            //TODO
+            //Ignore old messages
+            //if (message.Date.AddMinutes(1) < DateTime.Now)
+            //    return;
 
             if (message.Text != null)
                 await MessageInvoker(message);
-        }
-
-        private Task UnknownUpdateHandlerAsync(ITelegramBotClient botClient, Update update)
-        {
-            Console.WriteLine($"Unknown update type: {update.Type}");
-            return Task.CompletedTask;
         }
 
         private async Task MessageInvoker(Message message)
@@ -125,12 +121,8 @@ namespace PowerBot.Core
             await StatsManager.AddStatAction(ActionType.Message);
 
             //Get message data
-            var chatId = message.Chat.Id;
             var user = await UserManager.AddOrUpdateUser(message);
-
-            if (message.Chat.Type == ChatType.Supergroup ||
-                message.Chat.Type == ChatType.Group)
-                await ChatManager.AddOrUpdateChat(message);
+            var chat = await ChatManager.AddOrUpdateChat(message);
 
             //Get all handlers
             var handlers = ReflectiveEnumerator.GetEnumerableOfType<BaseHandler>();
@@ -154,7 +146,7 @@ namespace PowerBot.Core
                             //Get and send chatAction from attributes
                             var chatAction = BaseHandler.GetChatActionAttributes(method);
                             if (chatAction.HasValue)
-                                await Bot.SendChatActionAsync(chatId, chatAction.Value);
+                                await Bot.SendChatActionAsync(message.Chat.Id, chatAction.Value);
 
                             //Cast handler object
                             var handler = Activator.CreateInstance(handlerType);
@@ -167,7 +159,6 @@ namespace PowerBot.Core
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex.Message, "Invoker error");
                             await LogsManager.CreateLog($"Invoker error *{ex.Message}*", LogLevel.Critical);
 
                             //Log stats
@@ -182,30 +173,6 @@ namespace PowerBot.Core
                     }
                 }
             }
-        }
-
-        private async Task<bool> CheckMessage(Message message)
-        {
-            // Process user in db
-            var user = await UserManager.AddOrUpdateUser(message);
-
-            //Filters for messages
-            if (message != null)
-            {
-                //Specific filter messages
-                //var msg = message.Text;
-                //if (msg == null || (message.Type != MessageType.Text && message.Type != MessageType.Document)) return false;
-
-                //Ignore old messages
-                //if (message.Date.AddMinutes(1) < DateTime.UtcNow)
-                //    return false;
-            }
-
-            //Authorize User (if user banned - ignore)
-            if (user.IsBanned)
-                return false;
-
-            return true;
         }
     }
 }

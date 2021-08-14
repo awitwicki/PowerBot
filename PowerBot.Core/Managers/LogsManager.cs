@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 
 namespace PowerBot.Core.Managers
 {
@@ -24,6 +25,8 @@ namespace PowerBot.Core.Managers
        
         public static async Task CreateLog(string message, LogLevel logLevel)
         {
+            Console.WriteLine(message);
+
             await _dbContext.Logs.AddAsync(new Log
             {
                 DateTime = DateTime.Now,
@@ -32,6 +35,11 @@ namespace PowerBot.Core.Managers
             });
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        public static void CreateLogSync(string message, LogLevel logLevel)
+        {
+            CreateLog(message, logLevel).GetAwaiter().GetResult();
         }
     }
 }
