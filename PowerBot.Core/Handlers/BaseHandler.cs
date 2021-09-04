@@ -7,19 +7,21 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace PowerBot.Core
+namespace PowerBot.Core.Handlers
 {
     public abstract class BaseHandler
     {
         public TelegramBotClient Bot { get; set; }
-        public PowerBot.Core.Models.PowerbotUser User { get; set; }
+        public PowerbotUser User { get; set; }
         public Message Message { get; set; }
-        public long MessageId => Message.From.Id;
-        public long ChatId => Message.Chat.Id;
-        public void Init(TelegramBotClient bot, PowerbotUser user, Message message)
+        public CallbackQuery CallbackQuery{ get; set; }
+        public long MessageId => Message != null ? Message.MessageId : CallbackQuery.Message.MessageId;
+        public long ChatId => Message != null ? Message.Chat.Id : CallbackQuery.Message.Chat.Id;
+        public void Init(TelegramBotClient bot, PowerbotUser user, CallbackQuery callbackQuery = null, Message message = null)
         {
             Bot = bot;
             User = user;
+            CallbackQuery = callbackQuery;
             Message = message;
         }
 

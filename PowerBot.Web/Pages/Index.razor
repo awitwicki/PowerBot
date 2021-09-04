@@ -13,6 +13,9 @@
             <RadzenLineSeries Data="@messages" CategoryProperty="Date" Title="Messages" LineType="LineType.Dashed" ValueProperty="Count">
                 <RadzenMarkers MarkerType="MarkerType.Circle" />
             </RadzenLineSeries>
+            <RadzenLineSeries Data="@calbackQueries" CategoryProperty="Date" Title="Buttons" LineType="LineType.Dashed" ValueProperty="Count">
+                <RadzenMarkers MarkerType="MarkerType.Circle" />
+            </RadzenLineSeries>
             <RadzenLineSeries Data="@errors" CategoryProperty="Date" Title="Errors" ValueProperty="Count">
                 <RadzenMarkers MarkerType="MarkerType.Circle" />
             </RadzenLineSeries>
@@ -34,12 +37,14 @@
     protected override async Task OnInitializedAsync()
     {
         messages = await StatsManager.GetAggregatedStats(ActionType.Message, DateTime.UtcNow.Date.AddDays(-5), DateTime.UtcNow.Date.AddDays(1), TimeRangeAggregationTypes.Daily);
+        calbackQueries = await StatsManager.GetAggregatedStats(ActionType.CallbackQuery, DateTime.UtcNow.Date.AddDays(-5), DateTime.UtcNow.Date.AddDays(1), TimeRangeAggregationTypes.Daily);
         errors = await StatsManager.GetAggregatedStats(ActionType.Error, DateTime.UtcNow.Date.AddDays(-5), DateTime.UtcNow.Date.AddDays(1), TimeRangeAggregationTypes.Daily);
 
         todayCount = (await StatsManager.GetStats(DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(1))).Count;
     }
 
     DataItem[] messages = new DataItem[] { };
+    DataItem[] calbackQueries = new DataItem[] { };
     DataItem[] errors = new DataItem[] { };
 
 }

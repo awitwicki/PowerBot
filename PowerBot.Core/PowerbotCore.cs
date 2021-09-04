@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using PowerBot.Core.Handlers;
 using PowerBot.Core.Managers;
 using PowerBot.Core.Models;
 using System;
@@ -69,7 +70,7 @@ namespace PowerBot.Core
             {
                 UpdateType.Message => BotOnMessageReceived(botClient, update.Message),
                 //UpdateType.EditedMessage => BotOnMessageReceived(botClient, update.EditedMessage),
-                //UpdateType.CallbackQuery => BotOnCallbackQueryReceived(botClient, update.CallbackQuery),
+                UpdateType.CallbackQuery => BotOnCallbackQueryReceived(botClient, update.CallbackQuery),
                 //UpdateType.InlineQuery => BotOnInlineQueryReceived(botClient, update.InlineQuery),
                 //UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(botClient, update.ChosenInlineResult),
                 _ => UnknownUpdateHandlerAsync(botClient, update)
@@ -115,13 +116,23 @@ namespace PowerBot.Core
                 await MessageInvoker(message);
         }
 
+        async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery)
+        {
+            //TODO
+            //Ignore old messages
+            //if (message.Date.AddMinutes(1) < DateTime.Now)
+            //    return;
+
+            await CallbackQueryInvoker(callbackQuery);
+        }
+
         private async Task MessageInvoker(Message message)
         {
             //Log stats
             await StatsManager.AddStatAction(ActionType.Message);
 
             //Get message data
-            var user = await UserManager.AddOrUpdateUser(message);
+            var user = await UserManager.AddOrUpdateUser(message.From);
             var chat = await ChatManager.AddOrUpdateChat(message);
 
             //Get all handlers
@@ -152,7 +163,66 @@ namespace PowerBot.Core
                             var handler = Activator.CreateInstance(handlerType);
 
                             //Set params
-                            ((BaseHandler)handler).Init(Bot, user, message);
+                            ((BaseHandler)handler).Init(Bot, user, message: message);
+
+                            //Invoke method
+                            await (Task)method.Invoke(handler, parameters: new object[] { });
+                        }
+                        catch (Exception ex)
+                        {
+                            await LogsManager.CreateLog($"Invoker error *{ex.Message}*", LogLevel.Critical);
+
+                            //Log stats
+                            await StatsManager.AddStatAction(ActionType.Error);
+                        }
+                    }
+                    else
+                    {
+                        //Cant find method
+                        //await LogsManager.CreateLog($"Can't find method for *{messageEventArgs.Message.Text}*", LogLevel.Warning);
+                        //Console.WriteLine($"Can't find method for *{messageEventArgs.Message.Text}*");
+                    }
+                }
+            }
+        }
+
+        private async Task CallbackQueryInvoker(CallbackQuery callbackQuery)
+        {
+            //Log stats
+            await StatsManager.AddStatAction(ActionType.CallbackQuery);
+
+            //Get message data
+            var user = await UserManager.AddOrUpdateUser(callbackQuery.From);
+
+            //Get all handlers
+            var handlers = ReflectiveEnumerator.GetEnumerableOfType<BaseCallbackQueryHandler>();
+
+            foreach (var handlerType in handlers)
+            {
+                //Find method in handler
+                MethodInfo[] handlerMethods = handlerType.GetMethods();
+
+                foreach (var method in handlerMethods)
+                {
+                    //Pattern matching for message text
+                    if (BaseHandler.MatchMethod(method, callbackQuery.Data))
+                    {
+                        //Check user access by role
+                        if (!BaseHandler.ValidateAccess(method, user))
+                            return;
+
+                        try
+                        {
+                            //Get and send chatAction from attributes
+                            var chatAction = BaseHandler.GetChatActionAttributes(method);
+                            if (chatAction.HasValue)
+                                await Bot.SendChatActionAsync(callbackQuery.Message.Chat.Id, chatAction.Value);
+
+                            //Cast handler object
+                            var handler = Activator.CreateInstance(handlerType);
+
+                            //Set params
+                            ((BaseHandler)handler).Init(Bot, user, callbackQuery: callbackQuery);
 
                             //Invoke method
                             await (Task)method.Invoke(handler, parameters: new object[] { });

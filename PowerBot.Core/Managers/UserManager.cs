@@ -26,35 +26,34 @@ namespace PowerBot.Core.Managers
             var users = await _dbContext.Users.ToListAsync();
             return users;
         }
-
-        public static async Task<PowerbotUser> AddOrUpdateUser(Message message)
+        public static async Task<PowerbotUser> AddOrUpdateUser(User user)
         {
-            var usr = await GetUser(message.From.Id);
+            var usr = await GetUser(user.Id);
 
             // New user
             if (usr == null)
             {
-                PowerbotUser user = new PowerbotUser
+                PowerbotUser _user = new PowerbotUser
                 {
-                    Id = message.From.Id,
+                    Id = user.Id,
                     ActiveAt = DateTime.UtcNow,
                     UserAccess = UserAccess.User,
-                    FirstName = message.From.FirstName,
-                    LastName = message.From.LastName,
-                    UserName = message.From.Username
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    UserName = user.Username
                 };
 
-                var usrEntity = await _dbContext.Users.AddAsync(user);
+                var usrEntity = await _dbContext.Users.AddAsync(_user);
                 usr = usrEntity.Entity;
 
-                await LogsManager.CreateLog($"New user ({user.FullName})", LogLevel.Info);
+                await LogsManager.CreateLog($"New user ({_user.FullName})", LogLevel.Info);
             }
             // Update User
             else
             {
-                usr.FirstName = message.From.FirstName;
-                usr.LastName = message.From.LastName;
-                usr.UserName = message.From.Username;
+                usr.FirstName = user.FirstName;
+                usr.LastName = user.LastName;
+                usr.UserName = user.Username;
                 usr.ActiveAt = DateTime.UtcNow;
             }
 

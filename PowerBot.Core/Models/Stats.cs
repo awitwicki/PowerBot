@@ -20,6 +20,7 @@ namespace PowerBot.Core.Models
     public enum ActionType
     {
         Message,
+        CallbackQuery,
         Error
     }
 }
