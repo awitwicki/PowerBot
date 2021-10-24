@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApi.Middleware;
 
 namespace PowerBot.Web
 {
@@ -64,10 +65,14 @@ namespace PowerBot.Web
 
             app.UseRouting();
 
+            // custom auth middleware
+            app.UseMiddleware<AuthMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapRazorPages();
             });
         }
     }

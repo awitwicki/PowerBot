@@ -1,0 +1,97 @@
+﻿@page
+@model PowerBot.Web.Pages.LoginModel
+
+<div class="wrapper">
+    <div class="formContent">
+        <h2>PowerBot Admin panel </h2>
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <input type="password" name="password" placeholder="PASSWORD" required>
+            <div class="formFooter">
+               <input type="submit" class="btn-login" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    body {
+        font-family: "Poppins", sans-serif;
+        background-image: linear-gradient(205deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        display: inline-block;
+        margin: 40px 8px 10px 8px;
+        color: #0d0d0d;
+    }
+
+    .wrapper {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100%;
+    }
+
+    form {
+        margin: 0px;
+    }
+
+    .formContent {
+        -webkit-border-radius: 10px 10px 10px 10px;
+        border-radius: 10px 10px 10px 10px;
+        background: #fff;
+        padding: 30px;
+        width: 90%;
+        max-width: 450px;
+        position: relative;
+        padding: 0px;
+        -webkit-box-shadow: 0 0 60px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0 60px rgba(0, 0, 0, 0.3);
+        text-align: center;
+    }
+
+    .formFooter {
+        border-top: 1px solid #dce8f1;
+        padding: 25px;
+        text-align: center;
+        -webkit-border-radius: 0 0 10px 10px;
+        border-radius: 0 0 10px 10px;
+    }
+
+    input[type=password] {
+        background-color: #f6f6f6;
+        border: none;
+        color: #0d0d0d;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 5px;
+        margin-bottom: 20px;
+        width: 85%;
+        border: 2px solid #f6f6f6;
+        -webkit-border-radius: 5px 5px 5px 5px;
+        border-radius: 5px 5px 5px 5px;
+    }
+
+    input[type=password]:placeholder {
+        color: #cccccc;
+    }
+
+    .btn-login {
+        color: #fff;
+        background-color: #5d07c5;
+        font-weight: 400;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        border-radius: .25rem;
+        border: 1px solid transparent;
+        width: 200px;
+    }
+</style>

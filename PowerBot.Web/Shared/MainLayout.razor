@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
-
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration _configuration;
 <RadzenNotification />
 
 <div class="page">
@@ -9,6 +10,12 @@
 
     <div class="main">
         <div class="top-row px-4">
+            @if (_configuration["password"] != null)
+            {
+                <div>
+                    <a href="/logout">Logout</a>
+                </div>
+            }
             <a href="https://github.com/awitwicki/PowerBot" target="_blank">
                 <img class="img-logo" src="github-mark.png" />
             </a>

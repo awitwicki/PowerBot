@@ -35,6 +35,17 @@ namespace PowerBot.Web
             return host;
         }
 
+        public static IHostBuilder WithPassword(this IHostBuilder host, string password)
+        {
+            host.ConfigureAppConfiguration((context, config) =>
+            {
+                var settings = config.Build();
+                settings["password"] = password;
+            });
+
+            return host;
+        }
+
         public static void StartWithWebServer(this IHostBuilder host)
         {
             host.Build().Run();

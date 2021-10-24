@@ -12,6 +12,7 @@ namespace ConsoleSample
             PowerBotBuilder
                 .BuildPowerBot()
                 .WithAccessToken("TELEGRAM_BOT_TOKEN")
+                .WithPassword("admin")
                 .StartWithWebServer();
         }
     }
