@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace PowerBot.Web
         {
             host.ConfigureAppConfiguration((context, config) =>
                 {
-                    var settings = config.Build();
-                    settings["TelegramAccessToken"] = accessToken;
+                    IConfigurationRoot configuration = config.Build();
+                    configuration["TelegramAccessToken"] = accessToken;
                 });
             
             return host;
@@ -28,8 +29,8 @@ namespace PowerBot.Web
         {
             host.ConfigureAppConfiguration((context, config) =>
                 {
-                    var settings = config.Build();
-                    settings["TelegramAccessTokenEnvName"] = accessTokenEnvName;
+                    IConfigurationRoot configuration = config.Build();
+                    configuration["TelegramAccessTokenEnvName"] = accessTokenEnvName;
                 });
 
             return host;
@@ -39,8 +40,22 @@ namespace PowerBot.Web
         {
             host.ConfigureAppConfiguration((context, config) =>
             {
-                var settings = config.Build();
-                settings["password"] = password;
+                IConfigurationRoot configuration = config.Build();
+                configuration["password"] = password;
+            });
+
+            return host;
+        }
+
+        public static IHostBuilder WithPasswordEnv(this IHostBuilder host, string passwordEnvName)
+        {
+            string password = Environment.GetEnvironmentVariable(passwordEnvName) ??
+                throw new InvalidOperationException($"Can't find environment variable {passwordEnvName}");
+            
+            host.ConfigureAppConfiguration((context, config) =>
+            {
+                IConfigurationRoot configuration = config.Build();
+                configuration["password"] = password;
             });
 
             return host;

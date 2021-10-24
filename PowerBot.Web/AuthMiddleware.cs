@@ -31,7 +31,7 @@ namespace WebApi.Middleware
 
             if (!isAuthorized && context.Request.Path.Value != ("/login"))
             {
-                //redirect to login
+                // Redirect to login
                 context.Response.Redirect("/login");
             }
             
